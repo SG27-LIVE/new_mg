@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manifest Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <form id="manifestForm">
+    <label for="productName">Product Name:</label>
+    <select id="productName" name="productName">
+      <option value="Bluedart">Bluedart</option>
+      <option value="Ekart KRT">Ekart KRT</option>
+      <option value="EKART SRT">EKART SRT</option>
+      <option value="Delhivery">Delhivery</option>
+      <option value="ECom">ECom</option>
+      <option value="Smartr">Smartr</option>
+      <option value="Xpressbees">Xpressbees</option>
+      <option value="India Post">India Post</option>
+      <option value="DTDC">DTDC</option>
+      <option value="Shadowfax">Shadowfax</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label for="awbNumber">AWB Numbers (Separate by line break):</label>
+    <textarea id="awbNumber" name="awbNumber" rows="5"></textarea>
+
+    <label for="pickupDate">Date of Pick Up:</label>
+    <input type="text" id="pickupDate" name="pickupDate" placeholder="Enter Pick-Up Date">
+
+    <label for="shipmentCount">Number of Shipments:</label>
+    <input type="text" id="shipmentCount" name="shipmentCount" placeholder="Enter Number of Shipments">
+
+    <button type="button" id="generateManifest">Generate Manifest</button>
+    <button type="button" id="downloadExcel">Download as Excel</button>
+    <button type="button" id="downloadPDF">Download as PDF</button>
+  </form>
+
+  <script src="script.js"></script>
+</body>
+</html>
