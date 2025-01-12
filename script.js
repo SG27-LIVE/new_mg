@@ -1,88 +1,81 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const generateManifest = () => {
-    const productName = document.getElementById('productName').value;
-    const awbNumbers = document.getElementById('awbNumber').value.split('\n').map(num => num.trim());
-    const pickupDate = document.getElementById('pickupDate').value;
-    const shipmentCount = document.getElementById('shipmentCount').value;
+  const manifestForm = document.getElementById('manifestForm');
+  const awbNumberField = document.getElementById('awbNumber');
+  const productNameField = document.getElementById('productName');
+  const pickupDateField = document.getElementById('pickupDate');
+  const shipmentCountField = document.getElementById('shipmentCount');
 
+  // Function to generate manifest table
+  const generateManifestTable = () => {
+    const awbNumbers = awbNumberField.value.split('\n').map(num => num.trim());
+    const tableBody = document.getElementById('manifestTableBody');
+    tableBody.innerHTML = ''; // Clear existing table rows
+
+    // Detect duplicate AWB numbers
+    const duplicateChecker = new Set();
     const duplicates = new Set();
-    const uniqueCheck = new Set();
+
     awbNumbers.forEach(num => {
-      if (uniqueCheck.has(num)) duplicates.add(num);
-      uniqueCheck.add(num);
+      if (duplicateChecker.has(num)) {
+        duplicates.add(num);
+      }
+      duplicateChecker.add(num);
     });
 
-    let manifestDetails = `
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>AWB Number</th>
-            <th>No.</th>
-            <th>AWB Number</th>
-            <th>No.</th>
-            <th>AWB Number</th>
-            <th>No.</th>
-            <th>AWB Number</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+    // Populate table rows
+    for (let i = 0; i < awbNumbers.length; i += 4) {
+      const row = document.createElement('tr');
+
+      for (let j = 0; j < 4; j++) {
+        const awbIndex = i + j;
+        const cellNo = document.createElement('td');
+        const cellAwb = document.createElement('td');
+
+        if (awbIndex < awbNumbers.length) {
+          cellNo.textContent = awbIndex + 1;
+          cellAwb.textContent = awbNumbers[awbIndex];
+          if (duplicates.has(awbNumbers[awbIndex])) {
+            cellAwb.style.backgroundColor = 'yellow';
+          }
+        }
+
+        row.appendChild(cellNo);
+        row.appendChild(cellAwb);
+      }
+      tableBody.appendChild(row);
+    }
+  };
+
+  // Function to download manifest as Excel
+  const downloadAsExcel = () => {
+    const awbNumbers = awbNumberField.value.split('\n').map(num => num.trim());
+    const workbook = XLSX.utils.book_new();
+    const worksheetData = [['No.', 'AWB Number', 'No.', 'AWB Number', 'No.', 'AWB Number', 'No.', 'AWB Number']];
 
     for (let i = 0; i < awbNumbers.length; i += 4) {
-      manifestDetails += '<tr>';
-      for (let j = i; j < i + 4; j++) {
-        const awb = awbNumbers[j] || '';
-        manifestDetails += `<td>${j + 1 || ''}</td>`;
-        if (duplicates.has(awb)) {
-          manifestDetails += `<td style="background-color: yellow;">${awb || ''}</td>`;
-        } else {
-          manifestDetails += `<td>${awb || ''}</td>`;
-        }
+      const row = [];
+      for (let j = 0; j < 4; j++) {
+        const index = i + j;
+        row.push(index + 1);
+        row.push(index < awbNumbers.length ? awbNumbers[index] : '');
       }
-      manifestDetails += '</tr>';
+      worksheetData.push(row);
     }
 
-    manifestDetails += '</tbody></table>';
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-      <head><title>Manifest</title></head>
-      <body>
-        <h1>Manifest - ${productName}</h1>
-        <p><strong>Date of Pick Up:</strong> ${pickupDate}</p>
-        <p><strong>Number of Shipments:</strong> ${shipmentCount}</p>
-        ${manifestDetails}
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
-
-  const downloadExcel = () => {
-    const awbNumbers = document.getElementById('awbNumber').value.split('\n').map(num => num.trim());
-    const productName = document.getElementById('productName').value;
-
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([['No.', 'AWB Number']]);
-
-    awbNumbers.forEach((awb, index) => {
-      XLSX.utils.sheet_add_aoa(worksheet, [[index + 1, awb]], { origin: -1 });
-    });
-
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Manifest');
-    XLSX.writeFile(workbook, `Manifest_${productName}.xlsx`);
+    XLSX.writeFile(workbook, `Manifest_${productNameField.value}.xlsx`);
   };
 
-  const downloadPDF = () => {
+  // Function to download manifest as PDF
+  const downloadAsPDF = () => {
+    const productName = productNameField.value;
+    const awbNumbers = awbNumberField.value.split('\n').map(num => num.trim());
+    const pickupDate = pickupDateField.value;
+    const shipmentCount = shipmentCountField.value;
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
-    const productName = document.getElementById('productName').value;
-    const awbNumbers = document.getElementById('awbNumber').value.split('\n').map(num => num.trim());
-    const pickupDate = document.getElementById('pickupDate').value;
-    const shipmentCount = document.getElementById('shipmentCount').value;
 
     doc.text(`Manifest - ${productName}`, 10, 10);
     doc.text(`Date of Pick Up: ${pickupDate}`, 10, 20);
@@ -100,12 +93,25 @@ document.addEventListener('DOMContentLoaded', () => {
       body: tableData.map((row, index) => [
         index * 4 + 1, row[0], index * 4 + 2, row[1], index * 4 + 3, row[2], index * 4 + 4, row[3],
       ]),
+      startY: 40,
     });
 
     doc.save(`Manifest_${productName}.pdf`);
   };
 
-  document.getElementById('generateManifest').addEventListener('click', generateManifest);
-  document.getElementById('downloadExcel').addEventListener('click', downloadExcel);
-  document.getElementById('downloadPDF').addEventListener('click', downloadPDF);
+  // Event listeners
+  manifestForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    generateManifestTable();
+  });
+
+  document.getElementById('downloadExcel').addEventListener('click', (event) => {
+    event.preventDefault();
+    downloadAsExcel();
+  });
+
+  document.getElementById('downloadPDF').addEventListener('click', (event) => {
+    event.preventDefault();
+    downloadAsPDF();
+  });
 });
