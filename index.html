@@ -5,40 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manifest Generator</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <form id="manifestForm">
-    <label for="productName">Product Name:</label>
-    <select id="productName" name="productName">
-      <option value="Bluedart">Bluedart</option>
-      <option value="Ekart KRT">Ekart KRT</option>
-      <option value="EKART SRT">EKART SRT</option>
-      <option value="Delhivery">Delhivery</option>
-      <option value="ECom">ECom</option>
-      <option value="Smartr">Smartr</option>
-      <option value="Xpressbees">Xpressbees</option>
-      <option value="India Post">India Post</option>
-      <option value="DTDC">DTDC</option>
-      <option value="Shadowfax">Shadowfax</option>
-      <option value="Other">Other</option>
-    </select>
+  <div class="container">
+    <h1>Manifest Generator</h1>
+    <form id="manifestForm">
+      <label for="productName">Product Name:</label>
+      <input type="text" id="productName" placeholder="Enter product name" required>
 
-    <label for="awbNumber">AWB Numbers (Separate by line break):</label>
-    <textarea id="awbNumber" name="awbNumber" rows="5"></textarea>
+      <label for="pickupDate">Date of Pick Up:</label>
+      <input type="date" id="pickupDate" required>
 
-    <label for="pickupDate">Date of Pick Up:</label>
-    <input type="text" id="pickupDate" name="pickupDate" placeholder="Enter Pick-Up Date">
+      <label for="awbNumber">AWB Numbers:</label>
+      <textarea id="awbNumber" placeholder="Enter AWB numbers, one per line" rows="10" required></textarea>
 
-    <label for="shipmentCount">Number of Shipments:</label>
-    <input type="text" id="shipmentCount" name="shipmentCount" placeholder="Enter Number of Shipments">
+      <label for="shipmentCount">Number of Shipments:</label>
+      <input type="text" id="shipmentCount" placeholder="Enter shipment count" required>
 
-    <button type="button" id="generateManifest">Generate Manifest</button>
-    <button type="button" id="downloadExcel">Download as Excel</button>
-    <button type="button" id="downloadPDF">Download as PDF</button>
-  </form>
+      <button type="submit">Generate Table</button>
+    </form>
 
+    <div class="buttons">
+      <button id="printManifest">Print Manifest</button>
+      <button id="downloadExcel">Download Excel</button>
+      <button id="downloadPDF">Download PDF</button>
+    </div>
+
+    <div id="printArea" style="display:none;">
+      <h2>406, AMAZING STAR SURAT</h2>
+      <p>1. Courier Person Name: _________________________</p>
+      <p>2. Courier Person Contact Details: ________________</p>
+      <p>3. Courier Person Signature: _____________________</p>
+      <p>4. Number of Shipment: <span id="manualShipment"></span></p>
+      <p>5. Date of Pick Up: <span id="manualPickupDate"></span></p>
+    </div>
+
+    <table id="manifestTable">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>AWB Number</th>
+          <th>No.</th>
+          <th>AWB Number</th>
+          <th>No.</th>
+          <th>AWB Number</th>
+          <th>No.</th>
+          <th>AWB Number</th>
+        </tr>
+      </thead>
+      <tbody id="manifestTableBody"></tbody>
+    </table>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
